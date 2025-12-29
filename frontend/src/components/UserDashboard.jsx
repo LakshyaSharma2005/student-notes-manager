@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'; // Added AnimatePresenc
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 // Add the /config/ folder to the path
-import { designTokens } from '../config/themeConfig';
+import { designTokens } from '../config/themeConfig'; // Added /config/ to the path
 import { FaFileAlt, FaHeart, FaPlus, FaUserCircle } from 'react-icons/fa';
 
 const UserDashboard = () => {
