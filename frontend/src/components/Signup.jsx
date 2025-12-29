@@ -20,7 +20,7 @@ const Signup = () => {
     e.preventDefault();
     
     // UPDATED: Changed from localhost to your live Render Backend URL
-    axios.post('https://student-notes-manager.onrender.com/api/users/register', formData)
+    axios.post('https://notes-backend-f2oj.onrender.com/api/users/register', formData)
       .then((response) => {
         toast.success("Account created successfully!");
         console.log("Response:", response.data);
