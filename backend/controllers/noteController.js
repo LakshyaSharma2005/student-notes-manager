@@ -43,11 +43,12 @@ const createNote = async (req, res) => {
             return res.status(400).json({ message: 'Missing required fields (Title, Subject, or User ID)' });
         }
 
+        // FIXED: Explicitly mapping 'userId' from frontend to 'user' field in MongoDB
         const note = await Note.create({
             title,
             subject,
             link: fileUrl,
-            user: userId // Links the note to the specific user in Atlas
+            user: userId 
         });
 
         res.status(201).json(note);
@@ -73,5 +74,4 @@ const deleteNote = async (req, res) => {
     }
 };
 
-// Export ALL functions including the new getUserNotes
 module.exports = { getNotes, getUserNotes, createNote, deleteNote };
