@@ -1,29 +1,35 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const connectDB = require('./config/db');
 const path = require('path');
+const cloudinary = require('cloudinary').v2;
+const connectDB = require('./config/db');
 
 dotenv.config();
 connectDB();
 
+// Cloudinary Config - Crucial for persistent storage on Render
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
 const app = express();
 
-// 1. Better CORS: Allows your specific live frontend to talk to this backend
+// Professional CORS configuration
 app.use(cors({
-  origin: ["https://notes-frontend-x6qe.onrender.com", "http://localhost:5173"],
+  origin: [process.env.FRONTEND_URL, "http://localhost:5173"],
   credentials: true
 }));
 
 app.use(express.json());
 
-// 2. Make the 'uploads' folder public
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// 3. ROUTE FIX: Changed /api/auth to /api/users to match your Signup.jsx code
-app.use('/api/users', require('./routes/authRoutes')); 
+// Routes
+app.use('/api/users', require('./routes/authRoutes'));
 app.use('/api/notes', require('./routes/noteRoutes'));
+// Placeholder for new professional features
+app.use('/api/social', require('./routes/socialRoutes')); 
 
 const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
