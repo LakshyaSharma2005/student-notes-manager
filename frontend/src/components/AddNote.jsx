@@ -27,8 +27,8 @@ const AddNote = () => {
     data.append("file", file); 
     data.append("userId", user._id);
 
-    // UPDATED: Connecting to your live Render Backend URL
-    axios.post("https://student-notes-manager.onrender.com/api/notes", data, {
+    // CORRECTED: Using your actual live Render Backend URL
+    axios.post("https://notes-backend-f2oj.onrender.com/api/notes", data, {
       headers: {
         "Content-Type": "multipart/form-data", 
       },
