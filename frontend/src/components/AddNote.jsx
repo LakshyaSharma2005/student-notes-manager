@@ -4,17 +4,15 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 const AddNote = () => {
-  // We use separate states for easier file handling
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
-  const [file, setFile] = useState(null); // <--- New State for the actual file
+  const [file, setFile] = useState(null); 
 
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // 1. Get User ID
     const user = JSON.parse(localStorage.getItem("user"));
 
     if (!user) {
@@ -23,17 +21,16 @@ const AddNote = () => {
         return;
     }
 
-    // 2. Create FormData (The "Envelope" for files)
     const data = new FormData();
     data.append("title", title);
     data.append("subject", subject);
-    data.append("file", file); // <--- Attach the PDF file here
+    data.append("file", file); 
     data.append("userId", user._id);
 
-    // 3. Send to Backend with the correct Header
-    axios.post("http://localhost:5000/api/notes", data, {
+    // UPDATED: Connecting to your live Render Backend URL
+    axios.post("https://student-notes-manager.onrender.com/api/notes", data, {
       headers: {
-        "Content-Type": "multipart/form-data", // <--- Important!
+        "Content-Type": "multipart/form-data", 
       },
     })
       .then((res) => {
@@ -56,7 +53,6 @@ const AddNote = () => {
         
         <form onSubmit={handleSubmit} className="space-y-4">
           
-          {/* Title Input */}
           <div>
             <label className="block text-gray-700 font-medium mb-1">Title</label>
             <input
@@ -69,7 +65,6 @@ const AddNote = () => {
             />
           </div>
 
-          {/* Subject Input */}
           <div>
             <label className="block text-gray-700 font-medium mb-1">Subject</label>
             <input
@@ -82,13 +77,12 @@ const AddNote = () => {
             />
           </div>
 
-          {/* File Input (The Big Change) */}
           <div>
             <label className="block text-gray-700 font-medium mb-1">Select PDF File</label>
             <input
               type="file"
-              accept="application/pdf" // <--- Restrict to PDFs only
-              onChange={(e) => setFile(e.target.files[0])} // <--- Capture the file object
+              accept="application/pdf" 
+              onChange={(e) => setFile(e.target.files[0])} 
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50"
               required
             />

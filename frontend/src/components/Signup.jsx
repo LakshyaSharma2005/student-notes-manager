@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link, useNavigate } from "react-router-dom"; 
 import toast from "react-hot-toast";
-import axios from "axios"; // Import axios
+import axios from "axios"; 
 
 const Signup = () => {
   const [formData, setFormData] = useState({
-    name: "", // Changed from 'fullName' to 'name' to match backend Model
+    name: "", 
     email: "",
     password: "",
   });
 
-  const navigate = useNavigate(); // Hook for redirection
+  const navigate = useNavigate(); 
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,15 +19,14 @@ const Signup = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Send data to Backend
-    axios.post('http://localhost:5000/api/users/register', formData)
+    // UPDATED: Changed from localhost to your live Render Backend URL
+    axios.post('https://student-notes-manager.onrender.com/api/users/register', formData)
       .then((response) => {
         toast.success("Account created successfully!");
         console.log("Response:", response.data);
-        navigate("/login"); // Redirect to login page after success
+        navigate("/login"); 
       })
       .catch((error) => {
-        // Show error message from backend (e.g., "User already exists")
         const errorMessage = error.response?.data?.message || "Signup failed";
         toast.error(errorMessage);
         console.error("Error:", error);
@@ -40,12 +39,11 @@ const Signup = () => {
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Create Account</h2>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name Input */}
           <div>
             <label className="block text-gray-600 mb-1">Full Name</label>
             <input
               type="text"
-              name="name" // Matches backend
+              name="name" 
               value={formData.name}
               onChange={handleChange}
               placeholder="Enter your full name"
@@ -54,7 +52,6 @@ const Signup = () => {
             />
           </div>
 
-          {/* Email Input */}
           <div>
             <label className="block text-gray-600 mb-1">Email Address</label>
             <input
@@ -68,7 +65,6 @@ const Signup = () => {
             />
           </div>
 
-          {/* Password Input */}
           <div>
             <label className="block text-gray-600 mb-1">Password</label>
             <input
