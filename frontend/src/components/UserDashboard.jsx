@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion'; // Added AnimatePresence to force usage
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { designTokens } from '../themeConfig'; 
+// Add the /config/ folder to the path
+import { designTokens } from '../config/themeConfig';
 import { FaFileAlt, FaHeart, FaPlus, FaUserCircle } from 'react-icons/fa';
 
 const UserDashboard = () => {

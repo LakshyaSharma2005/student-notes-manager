@@ -3,7 +3,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { designTokens } from "../themeConfig";
+// Add the /config/ folder to the path
+import { designTokens } from '../config/themeConfig';
 
 const AddNote = () => {
   const [title, setTitle] = useState("");
