@@ -7,7 +7,6 @@ import { FaSearch } from "react-icons/fa";
 const Home = () => {
   const [notes, setNotes] = useState([]);
   
-  // FIXED: We removed 'setUser' because we don't need it here
   const [user] = useState(() => {
     return JSON.parse(localStorage.getItem("user")) || null;
   });
@@ -15,14 +14,16 @@ const Home = () => {
   const [query, setQuery] = useState(""); 
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/notes")
+    // UPDATED: Now connecting to your Live Render Backend instead of localhost
+    axios.get("https://notes-backend-f2oj.onrender.com/api/notes")
       .then((res) => {
         setNotes(res.data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log("Error fetching notes:", err));
   }, []);
 
   const handleDelete = (id) => {
+    // This removes the note from the UI immediately after deletion
     setNotes(notes.filter((note) => note._id !== id));
   };
 
