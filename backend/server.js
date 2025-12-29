@@ -9,7 +9,7 @@ connectDB();
 
 const app = express();
 
-// 1. Improved CORS to allow your specific frontend
+// 1. Better CORS: Allows your specific live frontend to talk to this backend
 app.use(cors({
   origin: ["https://notes-frontend-x6qe.onrender.com", "http://localhost:5173"],
   credentials: true
@@ -17,10 +17,10 @@ app.use(cors({
 
 app.use(express.json());
 
-// 2. Static uploads folder
+// 2. Make the 'uploads' folder public
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// 3. ROUTE FIX: Changed to /api/users to match your Frontend code
+// 3. ROUTE FIX: Changed /api/auth to /api/users to match your Signup.jsx code
 app.use('/api/users', require('./routes/authRoutes')); 
 app.use('/api/notes', require('./routes/noteRoutes'));
 
