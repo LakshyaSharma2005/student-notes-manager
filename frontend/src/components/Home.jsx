@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import NoteCard from "./NoteCard";
 import { Link } from "react-router-dom";
-import { FaSearch } from "react-icons/fa"; 
-import { toast } from "react-hot-toast"; // Added for success/error messages
+import { FaSearch } from "react-icons/fa";
+import { toast } from "react-hot-toast"; // Import toast for notifications
 
 const Home = () => {
   const [notes, setNotes] = useState([]);
@@ -14,11 +14,12 @@ const Home = () => {
 
   const [query, setQuery] = useState(""); 
 
-  // Define the Live Backend URL in one place to avoid mistakes
+  // --- CONFIGURATION ---
+  // We define the URL once here so we don't make typos later
   const API_URL = "https://notes-backend-f2oj.onrender.com";
 
   useEffect(() => {
-    // UPDATED: Uses the constant API_URL defined above
+    // UPDATED: Using the variable API_URL
     axios.get(`${API_URL}/api/notes`)
       .then((res) => {
         setNotes(res.data);
@@ -26,22 +27,22 @@ const Home = () => {
       .catch((err) => console.log("Error fetching notes:", err));
   }, []);
 
-  // --- THE FIX IS HERE ---
+  // --- FIX: ACTUAL BACKEND DELETION ---
   const handleDelete = async (id) => {
-    // 1. Confirm before deleting (Good UX)
+    // 1. Safety Check: Ask user before deleting
     if (!window.confirm("Are you sure you want to delete this note?")) return;
 
     try {
-      // 2. Make the API call to the LIVE SERVER (Not localhost)
-      await axios.delete(`${API_URL}/api/notes/${id}`);
-      
-      // 3. If successful, remove from screen
-      setNotes(notes.filter((note) => note._id !== id));
-      toast.success("Note deleted successfully");
-
+        // 2. Send DELETE command to the LIVE SERVER (not localhost)
+        await axios.delete(`${API_URL}/api/notes/${id}`);
+        
+        // 3. Update the screen (UI) only if the server delete was successful
+        setNotes(notes.filter((note) => note._id !== id));
+        toast.success("Note deleted successfully");
+        
     } catch (error) {
-      console.error("Error deleting note:", error);
-      toast.error("Failed to delete note");
+        console.error("Delete failed:", error);
+        toast.error("Failed to delete note. Try again.");
     }
   };
 

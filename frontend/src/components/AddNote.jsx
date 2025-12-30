@@ -3,7 +3,6 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { designTokens } from '../config/themeConfig'; // Correct path to config
 
 const AddNote = () => {
   const [title, setTitle] = useState("");
@@ -13,18 +12,24 @@ const AddNote = () => {
 
   const navigate = useNavigate();
 
+  // --- CONFIGURATION ---
+  // The Live Backend URL
+  const API_URL = "https://notes-backend-f2oj.onrender.com";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     const user = JSON.parse(localStorage.getItem("user"));
 
+    // 1. Check Login Status
     if (!user) {
       toast.error("You must be logged in!");
       navigate("/login");
       return;
     }
 
+    // 2. Prepare Data
     const data = new FormData();
     data.append("title", title);
     data.append("subject", subject);
@@ -32,15 +37,17 @@ const AddNote = () => {
     data.append("userId", user._id); 
 
     try {
-      const res = await axios.post("https://notes-backend-f2oj.onrender.com/api/notes", data, {
+      // 3. Send Request to Live Server
+      const res = await axios.post(`${API_URL}/api/notes`, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      console.log(res.data);
+      console.log("Upload Success:", res.data);
       toast.success("Note uploaded successfully! 📂");
-      navigate("/dashboard"); 
+      navigate("/"); // Redirect to Home (Feed)
     } catch (err) {
-      console.error(err);
+      console.error("Upload Error:", err);
+      // Show the specific error message from the backend if available
       toast.error(err.response?.data?.message || "Failed to upload note.");
     } finally {
       setLoading(false);
@@ -48,11 +55,11 @@ const AddNote = () => {
   };
 
   return (
-    // Explicit usage of motion.div clears the "unused var" error
     <motion.div 
-      initial={designTokens.animations.pageTransition.initial}
-      animate={designTokens.animations.pageTransition.animate}
-      className="flex justify-center items-center min-h-[80vh]"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex justify-center items-center min-h-[80vh] px-4"
     >
       <div className="w-full max-w-lg bg-white p-8 rounded-3xl shadow-2xl border border-gray-100">
         <h2 className="text-3xl font-extrabold text-gray-900 mb-2 text-center">
@@ -104,8 +111,7 @@ const AddNote = () => {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={loading}
-            style={{ backgroundColor: designTokens.colors.primary }}
-            className={`w-full text-white font-bold py-4 rounded-2xl transition duration-300 shadow-lg shadow-blue-500/30 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+            className={`w-full bg-blue-600 text-white font-bold py-4 rounded-2xl transition duration-300 shadow-lg shadow-blue-500/30 ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'}`}
           >
             {loading ? "Uploading..." : "Upload Note"}
           </motion.button>
