@@ -8,7 +8,7 @@ const connectDB = require('./config/db');
 dotenv.config();
 connectDB();
 
-// Cloudinary Config - Crucial for persistent storage on Render
+// Cloudinary Config
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -17,25 +17,28 @@ cloudinary.config({
 
 const app = express();
 
-// Professional CORS configuration
+// CORS configuration
 app.use(cors({
   origin: [process.env.FRONTEND_URL, "http://localhost:5173"],
   credentials: true
 }));
 
 app.use(express.json());
-// ADDED: Necessary for handling URL encoded data (good for file uploads)
 app.use(express.urlencoded({ extended: false }));
 
-// --- VITAL FIX: SERVE STATIC FILES ---
-// This tells the server to allow access to the 'uploads' folder for PDF viewing
+// --- VITAL FIX: HEALTH CHECK ROUTE ---
+// Render checks this URL to see if your server is alive.
+// Without this, the deployment thinks your app is broken and Times Out.
+app.get('/', (req, res) => {
+  res.status(200).send("API is running successfully");
+});
+
+// --- STATIC FILES ---
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes
-// PRESERVED: Keeping '/api/users' because your Frontend uses this for Login
+// --- ROUTES ---
 app.use('/api/users', require('./routes/authRoutes'));
 app.use('/api/notes', require('./routes/noteRoutes'));
-// Placeholder for new professional features
 app.use('/api/social', require('./routes/socialRoutes')); 
 
 const PORT = process.env.PORT || 5000;
