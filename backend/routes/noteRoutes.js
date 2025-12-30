@@ -1,29 +1,33 @@
 const express = require('express');
 const router = express.Router();
+// Importing getUserNotes is crucial to prevent "undefined" crash
 const { getNotes, createNote, deleteNote, getUserNotes } = require('../controllers/noteController');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// --- PROFESSIONAL MULTER CONFIGURATION ---
-// Ensure the uploads directory exists to prevent server crashes
-const uploadDir = 'uploads/';
+// --- ROBUST PATH CONFIGURATION ---
+// Use path.join to lock the folder location to backend/uploads
+const uploadDir = path.join(__dirname, '../uploads');
+
+// Create the folder if it doesn't exist (Prevent server startup crash)
 if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
+    fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+// --- MULTER STORAGE SETUP ---
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir); 
   },
   filename: (req, file, cb) => {
-    // Unique naming convention: timestamp-originalName
+    // Unique naming: timestamp-random-originalName
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, uniqueSuffix + path.extname(file.originalname));
   }
 });
 
-// File filter to ensure only PDFs or specific documents are uploaded
+// Filter to strictly allow only PDFs
 const fileFilter = (req, file, cb) => {
   if (file.mimetype === 'application/pdf') {
     cb(null, true);
@@ -35,18 +39,19 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ 
   storage: storage,
   fileFilter: fileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB Limit
 });
 
 // --- ROUTES ---
 
-// 1. Get ALL notes (Public/Home feed)
+// 1. Get ALL notes (Public Feed)
 router.get('/', getNotes);
 
-// 2. NEW: Get notes for a SPECIFIC user (For your UserDashboard)
+// 2. Get notes for a SPECIFIC user (Protected Dashboard Route)
+// This route powers your UserDashboard "Total Uploads"
 router.get('/user/:userId', getUserNotes);
 
-// 3. Create a note with file upload
+// 3. Create a note with file upload (Middleware: upload.single)
 router.post('/', upload.single('file'), createNote);
 
 // 4. Delete a specific note
