@@ -1,17 +1,12 @@
 const Note = require("../models/Note");
-
-const fs = require("fs"); // Added for deleting files
-
+const fs = require("fs");
 const path = require("path");
 
 // @desc    Get all notes (Public Feed)
-
 // @route   GET /api/notes
-
 const getNotes = async (req, res) => {
   try {
     const notes = await Note.find();
-
     res.status(200).json(notes);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -19,17 +14,11 @@ const getNotes = async (req, res) => {
 };
 
 // @desc    Get notes for a specific user (FOR DASHBOARD)
-
 // @route   GET /api/notes/user/:userId
-
 const getUserNotes = async (req, res) => {
   try {
     const { userId } = req.params;
-
-    // Query database for notes where the user field matches the ID
-
     const notes = await Note.find({ user: userId });
-
     res.status(200).json(notes);
   } catch (error) {
     res
@@ -39,9 +28,7 @@ const getUserNotes = async (req, res) => {
 };
 
 // @desc    Create a new note (With File Upload)
-
 // @route   POST /api/notes
-
 const createNote = async (req, res) => {
   try {
     const { title, subject, userId } = req.body;
@@ -50,16 +37,11 @@ const createNote = async (req, res) => {
       return res.status(400).json({ message: "Please upload a PDF file" });
     }
 
-    // --- URL CONSTRUCTION UPGRADE ---
-
-    // We use req.file.filename instead of path to avoid "absolute path" bugs on Linux
-
+    // --- URL CONSTRUCTION ---
     const protocol = req.protocol;
-
     const host = req.get("host");
 
-    // This creates a clean URL like: https://your-site.com/uploads/17392...pdf
-
+    // Creates URL: https://your-site.com/uploads/filename.pdf
     const fileUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
 
     if (!title || !subject || !userId) {
@@ -68,11 +50,8 @@ const createNote = async (req, res) => {
 
     const note = await Note.create({
       title,
-
       subject,
-
       link: fileUrl,
-
       user: userId,
     });
 
@@ -83,9 +62,7 @@ const createNote = async (req, res) => {
 };
 
 // @desc    Delete a note AND the file
-
 // @route   DELETE /api/notes/:id
-
 const deleteNote = async (req, res) => {
   try {
     const note = await Note.findById(req.params.id);
@@ -94,23 +71,29 @@ const deleteNote = async (req, res) => {
       return res.status(404).json({ message: "Note not found" });
     }
 
-    // --- FILE CLEANUP (PROFESSIONAL) ---
+    // --- FILE CLEANUP LOGIC ---
+    let filename = null;
 
-    // Extract filename from the link to delete it from disk
-
-    const filename = note.link.split("/uploads/")[1];
+    // Safely extract filename from the full URL
+    if (note.link && note.link.includes("/uploads/")) {
+      filename = note.link.split("/uploads/")[1];
+    }
 
     if (filename) {
       const filePath = path.join(__dirname, "../uploads", filename);
-
-      // Check if file exists, then delete it
+      console.log(`Attempting to delete local file: ${filePath}`); // Debug Log
 
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
+        console.log("File deleted from disk successfully.");
+      } else {
+        console.log("File not found on disk (skipping file deletion).");
       }
     }
 
-    await note.deleteOne();
+    // --- DATABASE DELETION ---
+    // findByIdAndDelete is often more robust than .deleteOne()
+    await Note.findByIdAndDelete(req.params.id);
 
     res
       .status(200)
@@ -119,10 +102,9 @@ const deleteNote = async (req, res) => {
         message: "Note and file deleted successfully",
       });
   } catch (error) {
+    console.error("Delete Error:", error);
     res.status(500).json({ message: error.message });
   }
 };
-
-// Export ALL functions
 
 module.exports = { getNotes, getUserNotes, createNote, deleteNote };
