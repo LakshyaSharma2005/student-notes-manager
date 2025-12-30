@@ -1,18 +1,20 @@
-import { motion, AnimatePresence } from 'framer-motion'; // Added AnimatePresence to force usage
+import { motion, AnimatePresence } from 'framer-motion'; 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-// Add the /config/ folder to the path
-import { designTokens } from '../config/themeConfig'; // Added /config/ to the path
+import { useNavigate } from 'react-router-dom'; // Import the hook
+import { designTokens } from '../config/themeConfig'; 
 import { FaFileAlt, FaHeart, FaPlus, FaUserCircle } from 'react-icons/fa';
 
 const UserDashboard = () => {
   const [stats, setStats] = useState({ uploads: 0, favorites: 0 });
   const user = JSON.parse(localStorage.getItem("user"));
+  
+  // FIXED: You must initialize this hook for the button to work
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchUserStats = async () => {
       try {
-        // Pointing to your live backend
         const res = await axios.get(`https://notes-backend-f2oj.onrender.com/api/notes/user/${user?._id}`);
         setStats(prev => ({ ...prev, uploads: res.data.length }));
       } catch (err) {
@@ -23,7 +25,7 @@ const UserDashboard = () => {
   }, [user?._id]);
 
   return (
-    <AnimatePresence> {/* Using AnimatePresence forces the compiler to acknowledge framer-motion */}
+    <AnimatePresence>
       <motion.div 
         key="dashboard-wrapper"
         initial={{ opacity: 0, y: 20 }}
@@ -32,12 +34,10 @@ const UserDashboard = () => {
         transition={designTokens.animations.spring}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10"
       >
-        {/* Header Section */}
+        {/* Header */}
         <div className="flex items-center justify-between mb-10">
           <motion.div initial={{ x: -20 }} animate={{ x: 0 }}>
-            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
-              Dashboard
-            </h1>
+            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Dashboard</h1>
             <p className="mt-2 text-lg text-gray-600">
               Welcome back, <span className="font-semibold text-blue-600">{user?.name}</span>
             </p>
@@ -60,13 +60,17 @@ const UserDashboard = () => {
               <p className="text-blue-100 mb-8 max-w-md">
                 Upload your high-quality notes and help the community grow. Your current impact: {stats.uploads} resources shared.
               </p>
+              
+              {/* This button now works because 'navigate' is defined */}
               <motion.button 
+                onClick={() => navigate('/add-note')} 
                 whileTap={{ scale: 0.95 }}
                 whileHover={{ backgroundColor: "#f8fafc", color: "#1d4ed8" }}
-                className="bg-white text-blue-700 font-bold py-3 px-8 rounded-2xl shadow-lg flex items-center gap-2 transition-colors"
+                className="bg-white text-blue-700 font-bold py-3 px-8 rounded-2xl shadow-lg flex items-center gap-2 transition-colors cursor-pointer"
               >
                 <FaPlus /> Upload New Note
               </motion.button>
+
             </div>
             <motion.div 
               animate={{ rotate: [0, 10, 0] }} 
@@ -80,29 +84,25 @@ const UserDashboard = () => {
           {/* Sidebar Stats */}
           <div className="flex flex-col gap-6">
             <motion.div 
-              whileHover={{ y: -5, boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
+              whileHover={{ y: -5 }}
               className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-between"
             >
               <div>
                 <p className="text-sm font-medium text-gray-400 uppercase tracking-widest">Total Uploads</p>
                 <h3 className="text-4xl font-black text-gray-900 mt-1">{stats.uploads}</h3>
               </div>
-              <div className="bg-blue-50 p-4 rounded-2xl text-blue-600 text-2xl">
-                <FaFileAlt />
-              </div>
+              <div className="bg-blue-50 p-4 rounded-2xl text-blue-600 text-2xl"><FaFileAlt /></div>
             </motion.div>
 
             <motion.div 
-              whileHover={{ y: -5, boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1)" }}
+              whileHover={{ y: -5 }}
               className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-between"
             >
               <div>
                 <p className="text-sm font-medium text-gray-400 uppercase tracking-widest">Favorites</p>
                 <h3 className="text-4xl font-black text-gray-900 mt-1">{stats.favorites}</h3>
               </div>
-              <div className="bg-pink-50 p-4 rounded-2xl text-pink-500 text-2xl">
-                <FaHeart />
-              </div>
+              <div className="bg-pink-50 p-4 rounded-2xl text-pink-500 text-2xl"><FaHeart /></div>
             </motion.div>
           </div>
         </div>

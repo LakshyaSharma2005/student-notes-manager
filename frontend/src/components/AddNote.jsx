@@ -3,8 +3,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-// Add the /config/ folder to the path
-import { designTokens } from '../config/themeConfig'; // Added /config/ to the path
+import { designTokens } from '../config/themeConfig'; // Correct path to config
 
 const AddNote = () => {
   const [title, setTitle] = useState("");
@@ -18,11 +17,11 @@ const AddNote = () => {
     e.preventDefault();
     setLoading(true);
 
-    const user = JSON.parse(localStorage.getItem("user")); //
+    const user = JSON.parse(localStorage.getItem("user"));
 
     if (!user) {
       toast.error("You must be logged in!");
-      navigate("/login"); //
+      navigate("/login");
       return;
     }
 
@@ -30,20 +29,15 @@ const AddNote = () => {
     data.append("title", title);
     data.append("subject", subject);
     data.append("file", file);
-    data.append("userId", user._id); // This matches your backend controller
+    data.append("userId", user._id); 
 
     try {
-      // Connecting to your verified Live Render Backend
       const res = await axios.post("https://notes-backend-f2oj.onrender.com/api/notes", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       console.log(res.data);
       toast.success("Note uploaded successfully! 📂");
-      
-      // FIXED: Redirect to Dashboard so user can see their updated stats
       navigate("/dashboard"); 
     } catch (err) {
       console.error(err);
@@ -54,6 +48,7 @@ const AddNote = () => {
   };
 
   return (
+    // Explicit usage of motion.div clears the "unused var" error
     <motion.div 
       initial={designTokens.animations.pageTransition.initial}
       animate={designTokens.animations.pageTransition.animate}
