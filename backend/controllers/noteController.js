@@ -74,4 +74,5 @@ const deleteNote = async (req, res) => {
     }
 };
 
+// Open backend/controllers/noteController.js and check the bottom line:
 module.exports = { getNotes, getUserNotes, createNote, deleteNote };
