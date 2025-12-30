@@ -13,7 +13,7 @@ const AddNote = () => {
   const navigate = useNavigate();
 
   // --- CONFIGURATION ---
-  // The Live Backend URL
+  // The Live Backend URL (This is correct!)
   const API_URL = "https://notes-backend-f2oj.onrender.com";
 
   const handleSubmit = async (e) => {
@@ -37,6 +37,8 @@ const AddNote = () => {
     data.append("userId", user._id); 
 
     try {
+      console.log("Uploading to:", API_URL); // Debug Log
+
       // 3. Send Request to Live Server
       const res = await axios.post(`${API_URL}/api/notes`, data, {
         headers: { "Content-Type": "multipart/form-data" },
