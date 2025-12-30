@@ -3,6 +3,7 @@ import axios from "axios";
 import NoteCard from "./NoteCard";
 import { Link } from "react-router-dom";
 import { FaSearch } from "react-icons/fa"; 
+import { toast } from "react-hot-toast"; // Added for success/error messages
 
 const Home = () => {
   const [notes, setNotes] = useState([]);
@@ -13,18 +14,35 @@ const Home = () => {
 
   const [query, setQuery] = useState(""); 
 
+  // Define the Live Backend URL in one place to avoid mistakes
+  const API_URL = "https://notes-backend-f2oj.onrender.com";
+
   useEffect(() => {
-    // UPDATED: Now connecting to your Live Render Backend instead of localhost
-    axios.get("https://notes-backend-f2oj.onrender.com/api/notes")
+    // UPDATED: Uses the constant API_URL defined above
+    axios.get(`${API_URL}/api/notes`)
       .then((res) => {
         setNotes(res.data);
       })
       .catch((err) => console.log("Error fetching notes:", err));
   }, []);
 
-  const handleDelete = (id) => {
-    // This removes the note from the UI immediately after deletion
-    setNotes(notes.filter((note) => note._id !== id));
+  // --- THE FIX IS HERE ---
+  const handleDelete = async (id) => {
+    // 1. Confirm before deleting (Good UX)
+    if (!window.confirm("Are you sure you want to delete this note?")) return;
+
+    try {
+      // 2. Make the API call to the LIVE SERVER (Not localhost)
+      await axios.delete(`${API_URL}/api/notes/${id}`);
+      
+      // 3. If successful, remove from screen
+      setNotes(notes.filter((note) => note._id !== id));
+      toast.success("Note deleted successfully");
+
+    } catch (error) {
+      console.error("Error deleting note:", error);
+      toast.error("Failed to delete note");
+    }
   };
 
   // SEARCH FILTER
