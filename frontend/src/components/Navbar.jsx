@@ -1,12 +1,20 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // Now we will USE this variable below!
   const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
     localStorage.removeItem("user");
     navigate("/login");
+  };
+
+  // Helper to check if a link is active
+  const isActive = (path) => {
+    return location.pathname === path 
+      ? "text-blue-600 font-bold" 
+      : "text-gray-600 hover:text-blue-500 font-medium";
   };
 
   return (
@@ -15,16 +23,22 @@ const Navbar = () => {
         Student Notes
       </Link>
 
-      <div className="space-x-4">
-        <Link to="/" className="text-gray-600 hover:text-blue-500 font-medium">
+      <div className="space-x-4 flex items-center">
+        {/* Uses helper function to highlight active link */}
+        <Link to="/" className={isActive("/")}>
           Home
         </Link>
         
         {user ? (
           <>
-            <Link to="/add-note" className="text-gray-600 hover:text-blue-500 font-medium">
+            <Link to="/dashboard" className={isActive("/dashboard")}>
+              Dashboard
+            </Link>
+
+            <Link to="/add-note" className={isActive("/add-note")}>
               Upload Note
             </Link>
+            
             <button 
               onClick={handleLogout} 
               className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
