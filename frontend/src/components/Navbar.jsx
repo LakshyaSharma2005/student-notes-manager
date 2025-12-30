@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Now we will USE this variable below!
+  const location = useLocation(); // Now we use this variable below!
   const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
@@ -10,7 +10,7 @@ const Navbar = () => {
     navigate("/login");
   };
 
-  // Helper to check if a link is active
+  // Function to check if a link is active (Uses the 'location' variable)
   const isActive = (path) => {
     return location.pathname === path 
       ? "text-blue-600 font-bold" 
@@ -24,13 +24,14 @@ const Navbar = () => {
       </Link>
 
       <div className="space-x-4 flex items-center">
-        {/* Uses helper function to highlight active link */}
+        {/* Use the isActive helper to highlight links */}
         <Link to="/" className={isActive("/")}>
           Home
         </Link>
         
         {user ? (
           <>
+            {/* The Dashboard Link - Now visible and highlightable */}
             <Link to="/dashboard" className={isActive("/dashboard")}>
               Dashboard
             </Link>
